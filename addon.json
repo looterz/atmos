@@ -1,0 +1,16 @@
+{
+	"title"		:	"Atmos 2",
+	"author"  : "looter",
+	"description" : "Atmos 2 is the long awaited sequel to the popular day, night and weather suite for garrysmod",
+	"type"		:	"effects",
+	"tags"		:	[ "scenic", "fun" ],
+	"ignore"	:
+	[
+		"*.psd",
+		"*.vcproj",
+		"*.svn",
+		"*.git",
+		"addon.txt",
+		"logo.png"
+	]
+}
