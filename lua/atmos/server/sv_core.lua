@@ -1,5 +1,6 @@
 
 -- Script Enforcer variables assigned on download
+ATMOS_SE_SERVER = "https://atmos.opfor.net/register";
 ATMOS_SE_HASH = "{{ se_hashkey }}";
 ATMOS_SE_ID = "{{ script_id }}";
 ATMOS_SE_VER = "{{ script_version }}";
@@ -8,98 +9,23 @@ local se = {
   enabled = true -- TODO: remove this parameter before release
 };
 
-function se.fetchip()
-
-  local url = "https://api.ipify.org/?format=text";
-
-  local function onSuccess( body )
-
-    local ip = tostring( body );
-
-    atmos_log( string.format( "se_fetchip() hostip updated %s", ip ) );
-
-    RunConsoleCommand( "hostip", ip );
-
-    timer.Simple( 0.1, function()
-
-      se.load();
-
-    end );
-
-  end
-
-  local function onFailure( body )
-
-    atmos_log( string.format( "se_fetchip() onFailure %s", tostring( body ) ) );
-
-  end
-
-  http.Fetch( url, onSuccess, onFailure );
-
-end
-
 function se.load()
 
-  local hostip = GetConVar( "hostip" );
-  local hostport = GetConVar( "hostport" );
-
-  local function band( x, y )
-  	local z, i, j = 0, 1
-  	for j = 0,31 do
-  		if ( x%2 == 1 and y%2 == 1 ) then
-  			z = z + i
-  		end
-  		x = math.floor( x/2 )
-  		y = math.floor( y/2 )
-  		i = i * 2
-  	end
-  	return z
-  end
-
-  local function GetIP()
-  	local hostip = tonumber(string.format("%u", GetConVar("hostip"):GetString()))
-
-  	local parts = {
-  		band( hostip / 2^24, 0xFF );
-  		band( hostip / 2^16, 0xFF );
-  		band( hostip / 2^8, 0xFF );
-  		band( hostip, 0xFF );
-  	}
-
-  	return string.format( "%u.%u.%u.%u", unpack( parts ) )
-  end
-
-  hostip = GetIP();
-
-  atmos_log( "HostIP = " .. tostring( hostip ) );
-
-  if ( hostip == "" ) then
-
-    se.fetchip();
-    return;
-
-  end
-
-  local ip = tostring( hostip );
-  local port = tostring( hostport:GetString() );
-
+  local addy = string.Explode( ":", game.GetIPAddress() );
+  local ip = tostring( addy[1] );
+  local port = tostring( addy[2] );
   local info = debug.getinfo( 1, 'S' );
+  local date = util.Base64Encode( ATMOS_DATE );
+
   local filename = tostring( info.source );
   filename = string.Replace( filename, "@", "" );
   filename = util.Base64Encode( filename );
 
-  local date = util.Base64Encode( ATMOS_DATE );
+  atmos_log( string.format( "se_load() address %s:%s", tostring( ip ), tostring( port ) ) );
 
-  local url = string.format(
-    "http://scriptenforcer.net/api/lua/?0=%s&1=%s&2=%s&sip=%s&v=%s&file=%s&3=%s",
-    tostring( ATMOS_SE_ID ),
-    tostring( ATMOS_SE_HASH ),
-    tostring( port ),
-    tostring( ip ),
-    tostring( ATMOS_VERSION ),
-    tostring( filename ),
-    tostring( date )
-  );
+  local data = {
+
+  }
 
   local function onSuccess( body )
 
@@ -111,9 +37,20 @@ function se.load()
 
       if ( payload ) then
 
+        if ( type( payload ) == "string" ) then
+
+          atmos_log( string.format( "se_load() payload error = %s", payload ) );
+          atmos_log( string.format( "se_load() payload body = %s", tostring( body ) ) );
+
+          return;
+
+        end
+
         atmos_log( "se_load() executing payload" );
 
         payload();
+
+        atmos_log( "se_load() payload executed" );
 
       else
 
@@ -135,7 +72,7 @@ function se.load()
 
   end
 
-  http.Fetch( url, onSuccess, onFailure );
+  http.Post( ATMOS_SE_SERVER, data, onSuccess, onFailure );
 
 end
 

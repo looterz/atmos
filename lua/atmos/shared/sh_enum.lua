@@ -1,6 +1,6 @@
 
 ATMOS_VERSION   = 1.0;
-ATMOS_DATE      = "12/14/2015";
+ATMOS_DATE      = "7/6/2016"; -- version date
 ATMOS_DEBUG     = ATMOS_DEBUG_CVAR:GetInt() >= 1;
 ATMOS_WORKSHOP  = ""; --"185609021"; -- resource content pack workshop id
 ATMOS_LINK      = "https://scriptfodder.com/scripts/view/007"; -- link to Atmos 2
