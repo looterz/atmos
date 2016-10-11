@@ -18,6 +18,24 @@ net.Receive( "atmos_settings", function( len )
 
 end );
 
+net.Receive( "atmos_cvars", function( len )
+
+	local vars = net.ReadTable();
+
+	for _, v in pairs( vars ) do
+
+		CreateClientConVar( v.name, v.default, true, false, v.help );
+
+		if ( v.callback ) then
+
+			cvars.AddChangeCallback( v.name, v.callback, v.name .. "_callback" );
+
+		end
+
+	end
+
+end );
+
 -- Panels
 local function LogoPanel()
 

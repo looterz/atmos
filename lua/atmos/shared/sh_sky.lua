@@ -18,15 +18,19 @@ function SkyClass:__constructor()
 		self.Sun = ents.FindByClass( "env_sun" )[1];
 		self.SkyPaint = ents.FindByClass( "env_skypaint" )[1];
 
-		if ( IsValid( self.SkyPaint ) ) then
+		if ( Atmos:GetEnabled() ) then
 
-			self.SkyPaint:Remove();
+			if ( IsValid( self.SkyPaint ) ) then
+
+				self.SkyPaint:Remove();
+
+			end
+
+			self.SkyPaint = ents.Create( "atmos_sky" );
+			self.SkyPaint:Spawn();
+			self.SkyPaint:Activate();
 
 		end
-
-		self.SkyPaint = ents.Create( "atmos_sky" );
-		self.SkyPaint:Spawn();
-		self.SkyPaint:Activate();
 
 	else
 

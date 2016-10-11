@@ -12,17 +12,21 @@ function FogClass:__constructor()
 
 		self.FogController = ents.FindByClass( "env_fog_controller" )[1];
 
-		if ( !IsValid( self.FogController ) ) then
+		if ( Atmos:GetEnabled() ) then
 
-			self.FogController = ents.Create( "env_fog_controller" ); -- must exist for atmos_fog to function
-			self.FogController:Spawn();
-			self.FogController:Activate();
+			if ( !IsValid( self.FogController ) ) then
+
+				self.FogController = ents.Create( "env_fog_controller" ); -- must exist for atmos_fog to function
+				self.FogController:Spawn();
+				self.FogController:Activate();
+
+			end
+
+			self.Fog = ents.Create( "atmos_fog" );
+			self.Fog:Spawn();
+			self.Fog:Activate();
 
 		end
-
-		self.Fog = ents.Create( "atmos_fog" );
-		self.Fog:Spawn();
-		self.Fog:Activate();
 
 	end
 

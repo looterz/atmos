@@ -2,6 +2,7 @@
 local AdminCommands = {};
 local DeveloperCommands = {};
 local Commands = {};
+local Cvars = {};
 
 local function IsDeveloper( pl )
 
@@ -83,6 +84,34 @@ local function AddCommand( cmd, cmdargs, help, fn )
 
 end
 
+local function AddCvar( name, default, help, client, cb )
+
+  local name = string.format( "atmos_%s", tostring( name ) );
+
+  local cvar = {
+    name = name,
+    default = default,
+    help = help,
+    client = client,
+    callback = cb
+  };
+
+  if ( !client ) then
+
+    CreateConVar( name, default, bit.bor( FCVAR_ARCHIVE, FCVAR_GAMEDLL, FCVAR_REPLICATED ), help );
+
+    if ( cb ) then
+
+      cvars.AddChangeCallback( name, cb, name .. "_callback" );
+
+    end
+
+  end
+
+  table.insert( Cvars, cvar );
+
+end
+
 local function GetWeatherByName( name )
 
   name = string.lower( tostring( name ) );
@@ -121,28 +150,26 @@ local function PrintConsole( pl, str )
 
 end
 
-AddDeveloperCommand( "license", nil, "lists all licensing information", function( pl, cmd, args )
+-- Global aliases for modding api
+function AtmosAddDeveloperCommand( cmd, cmdargs, help, fn )
 
-  local license = "\n\nAtmos 2 License Information\n";
-  license = license .. "Hash: " .. tostring( ATMOS_SE_HASH ) .. "\n";
-  license = license .. "Version: " .. tostring( ATMOS_SE_VER ) .. "\n";
-  license = license .. "ID: " .. tostring( ATMOS_SE_ID ) .. "\n";
-  license = license .. "Address: " .. tostring( GetConVar( "hostip" ):GetString() ) .. ":" .. tostring( GetConVar( "hostport" ):GetString() ) .. "\n";
-  license = license .. "\n";
+  AddDeveloperCommand( cmd, cmdargs, help, fn );
 
-  PrintConsole( pl, license );
+end
 
-  -- send to clients clipboard
-  if ( IsValid( pl ) ) then
+function AtmosAddAdminCommand( cmd, cmdargs, help, fn )
 
-    net.Start( "atmos_license" );
-    net.WriteString( license );
-    net.Send( pl );
+  AddAdminCommand( cmd, cmdargs, help, fn );
 
-  end
+end
 
-end );
+function AtmosAddCommand( cmd, cmdargs, help, fn )
 
+  AddCommand( cmd, cmdargs, help, fn );
+
+end
+
+-- Console Commands
 AddCommand( "help", nil, "lists all available commands", function( pl, cmd, args )
 
   PrintConsole( pl, "\n\nAtmos 2 User Guide\n" );
@@ -229,6 +256,40 @@ AddCommand( "help", nil, "lists all available commands", function( pl, cmd, args
 
   end
 
+  PrintConsole( pl, "\n" );
+  PrintConsole( pl, "\nServer Cvars\n" );
+
+  for k, v in pairs( Cvars ) do
+
+    if ( !v.client ) then
+
+      local str = tostring( v.name ) .. " " .. tostring( v.default ) .. " " .. "- " .. tostring( v.help ) .. "\n";
+
+      PrintConsole( pl, str );
+
+    end
+
+    PrintConsole( pl, "\n" );
+
+  end
+
+  PrintConsole( pl, "\n" );
+  PrintConsole( pl, "\nClient Cvars\n" );
+
+  for k, v in pairs( Cvars ) do
+
+    if ( v.client ) then
+
+      local str = tostring( v.name ) .. " " .. tostring( v.default ) .. " " .. "- " .. tostring( v.help ) .. "\n";
+
+      PrintConsole( pl, str );
+
+    end
+
+    PrintConsole( pl, "\n" );
+
+  end
+
 end );
 
 AddCommand( "gettime", nil, "gets the current time", function( pl, cmd, args )
@@ -240,6 +301,20 @@ AddCommand( "gettime", nil, "gets the current time", function( pl, cmd, args )
     local time = math.Round( sky.Time, 2 );
 
     PrintConsole( pl, tostring( time ) .. "\n" );
+
+  end
+
+end );
+
+AddAdminCommand( "setenabled", { "[enabled]" }, "enables or disables atmos", function( pl, cmd, args )
+
+  local enabled = tobool( args[1] );
+
+  if ( IsValid( Atmos ) ) then
+
+    Atmos:SetEnabled( enabled );
+
+    PrintConsole( pl, (enabled and "Atmos is now enabled" or "Atmos is now disabled") .. ", server must change map to take effect.\n" );
 
   end
 
@@ -314,3 +389,9 @@ AddAdminCommand( "stopweather", nil, "stops any active weather", function( pl, c
     Atmos:FinishWeather();
 
 end );
+
+-- Server Cvars
+AddCvar( "weather", "1", "enables or disables weather", false );
+
+-- Client Cvars
+AddCvar( "hudeffects", "1", "enables or disables client-side hud effects", true );

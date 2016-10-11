@@ -34,9 +34,9 @@ atmos_log( "loading core..." );
 
 if SERVER then
 
-	include( "atmos/server/sv_core.lua" );
 	include( "atmos/server/sv_wind.lua" );
 	include( "atmos/server/sv_commands.lua" );
+	include( "atmos/server/sv_core.lua" );
 
 else
 

@@ -1,15 +1,14 @@
 
--- Script Enforcer variables assigned on download
-ATMOS_SE_SERVER = "https://atmos.opfor.net/register";
-ATMOS_SE_HASH = "{{ se_hashkey }}";
-ATMOS_SE_ID = "{{ script_id }}";
-ATMOS_SE_VER = "{{ script_version }}";
+local ATMOS_SERA_SERVER = "https://sera.opfor.net/register";
+local ATMOS_SERA_HASH = "{{ se_hashkey }}"; -- NOTE: se_hashkey was removed from scriptfodder due to drama between phoenix and matt apparently..
+local ATMOS_SERA_ID = "{{ script_id }}";
+local ATMOS_SERA_VER = "{{ script_version }}";
 
-local se = {
-  enabled = true -- TODO: remove this parameter before release
+local sera = {
+  enabled = false -- TODO: remove this parameter before release
 };
 
-function se.load()
+function sera.load()
 
   local addy = string.Explode( ":", game.GetIPAddress() );
   local ip = tostring( addy[1] );
@@ -21,46 +20,49 @@ function se.load()
   filename = string.Replace( filename, "@", "" );
   filename = util.Base64Encode( filename );
 
-  atmos_log( string.format( "se_load() address %s:%s", tostring( ip ), tostring( port ) ) );
+  atmos_log( string.format( "sera_load() address %s:%s", tostring( ip ), tostring( port ) ) );
 
   local data = {
-
-  }
+    IP = ip,
+    Port = port,
+    Src = filename,
+    Date = date
+  };
 
   local function onSuccess( body )
 
-    atmos_log( "se_load() onSuccess" );
+    atmos_log( "sera_load() onSuccess" );
 
     if ( body and string.len( body ) > 0 ) then
 
-      local payload = CompileString( body, "AtmosSE", false ); -- NOTE: hopefully returns nil on compile failure
+      local payload = CompileString( body, "AtmosDRM", false );
 
       if ( payload ) then
 
         if ( type( payload ) == "string" ) then
 
-          atmos_log( string.format( "se_load() payload error = %s", payload ) );
-          atmos_log( string.format( "se_load() payload body = %s", tostring( body ) ) );
+          atmos_log( string.format( "sera_load() payload error = %s", payload ) );
+          atmos_log( string.format( "sera_load() payload body = %s", tostring( body ) ) );
 
           return;
 
         end
 
-        atmos_log( "se_load() executing payload" );
+        atmos_log( "sera_load() executing payload" );
 
         payload();
 
-        atmos_log( "se_load() payload executed" );
+        atmos_log( "sera_load() payload executed" );
 
       else
 
-        atmos_log( "se_load() payload failed to compile!" );
+        atmos_log( "sera_load() payload failed to compile!" );
 
       end
 
     else
 
-      atmos_log( "se_load() payload is empty" );
+      atmos_log( "sera_load() payload is empty" );
 
     end
 
@@ -68,23 +70,23 @@ function se.load()
 
   local function onFailure( body )
 
-    atmos_log( string.format( "se_load() onFailure %s", tostring( body ) ) );
+    atmos_log( string.format( "sera_load() onFailure %s", tostring( body ) ) );
 
   end
 
-  http.Post( ATMOS_SE_SERVER, data, onSuccess, onFailure );
+  http.Post( ATMOS_SERA_SERVER, data, onSuccess, onFailure );
 
 end
 
-function se.init()
+function sera.init()
 
-  atmos_log( string.format( "se_init() %s %s %s", ATMOS_SE_HASH, ATMOS_SE_VER, ATMOS_SE_ID ) );
+  atmos_log( string.format( "sera_init() %s %s %s", ATMOS_SERA_HASH, ATMOS_SERA_VER, ATMOS_SERA_ID ) );
 
   -- Workshop Content Pack
   resource.AddWorkshop( ATMOS_WORKSHOP );
 
   -- Script Enforcer
-  se.load();
+  sera.load();
 
 end
 
@@ -95,14 +97,36 @@ hook.Add( "Think", id, function()
 
   timer.Simple( 1, function()
 
-    if ( se.enabled ) then
+    if ( sera.enabled ) then
 
-      se.init();
+      sera.init();
 
     end
 
   end );
 
   hook.Remove( "Think", id );
+
+end );
+
+AtmosAddDeveloperCommand( "license", nil, "lists all licensing information", function( pl, cmd, args )
+
+  local license = "\n\nAtmos 2 License Information\n";
+  license = license .. "Hash: " .. tostring( ATMOS_SE_HASH ) .. "\n";
+  license = license .. "Version: " .. tostring( ATMOS_SE_VER ) .. "\n";
+  license = license .. "ID: " .. tostring( ATMOS_SE_ID ) .. "\n";
+  license = license .. "Address: " .. tostring( GetConVar( "hostip" ):GetString() ) .. ":" .. tostring( GetConVar( "hostport" ):GetString() ) .. "\n";
+  license = license .. "\n";
+
+  PrintConsole( pl, license );
+
+  -- send to clients clipboard
+  if ( IsValid( pl ) ) then
+
+    net.Start( "atmos_license" );
+      net.WriteString( license );
+    net.Send( pl );
+
+  end
 
 end );
