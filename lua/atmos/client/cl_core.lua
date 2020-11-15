@@ -1,11 +1,5 @@
 
 -- Network Events
-net.Receive( "atmos_license", function( len )
-
-	SetClipboardText( tostring( net.ReadString() ) );
-
-end );
-
 net.Receive( "atmos_lightmaps", function( len )
 
 	render.RedownloadAllLightmaps();
