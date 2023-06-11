@@ -25,7 +25,8 @@ function ENT:Initialize()
 		"StarSpeed",
 		"StarScale",
 		"StarFade",
-		"StarTexture"
+		"StarTexture",
+        "StarLayers",
 	};
 
 	self.Values = {};
@@ -49,6 +50,7 @@ function ENT:Initialize()
 	self:SetDuskIntensity( 1 );
 	self:SetHDRScale( 0.66 );
 
+    self:SetStarLayers( 1 );
 	self:SetDrawStars( true );
 	self:SetStarSpeed( 0.01 );
 	self:SetStarScale( 0.5 );
@@ -82,7 +84,7 @@ function ENT:Think()
 
 	if ( g_SkyPaint != self ) then
 
-			g_SkyPaint = self;
+		g_SkyPaint = self;
 
 	end
 
