@@ -90,6 +90,12 @@ function Weather:IsValid()
 
 end
 
+function Weather:Initialize()
+
+    self:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+
+end
+
 function Weather:GetID()
 
 	return self.ID;

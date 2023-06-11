@@ -48,6 +48,12 @@ function FogClass:IsValid()
 
 end
 
+function FogClass:Initialize()
+
+    self:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+
+end
+
 function FogClass:Think()
 
 	if ( !IsValid( self ) ) then return end
