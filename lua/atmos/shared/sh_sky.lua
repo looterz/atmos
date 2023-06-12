@@ -57,6 +57,12 @@ function SkyClass:IsValid()
 
 end
 
+function SkyClass:Initialize()
+
+    self:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+
+end
+
 function SkyClass:Think()
 
 	if ( !IsValid( self ) ) then return end
