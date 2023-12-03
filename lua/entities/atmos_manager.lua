@@ -25,6 +25,7 @@ end
 
 function ENT:Initialize()
 
+	self:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 end
 

@@ -8,6 +8,8 @@ function ENT:UpdateTransmitState() return TRANSMIT_ALWAYS end
 
 function ENT:Initialize()
 
+	self:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+
 	if SERVER then return end
 
 	self.Keys = {
