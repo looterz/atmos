@@ -4,6 +4,7 @@ AtmosClass = atmos_class();
 function AtmosClass:__constructor()
 
 	self.Weathers = {};
+	self.WeathersIDs = {};
 
 	self.HeightMin = 0;
 	self.NextOutsideCheck = 0;
@@ -102,11 +103,27 @@ function AtmosClass:RegisterWeather( weather )
 
 	table.insert( self.Weathers, weather );
 
+	if !weather.ID then return end -- sanity check for third-party addons
+
+	self.WeathersIDs[weather.ID] = #self.Weathers
+
 end
 
 function AtmosClass:GetWeathers()
 
 	return self.Weathers;
+
+end
+
+function AtmosClass:GetWeatherByID(id)
+
+    if !id then return end
+
+    local index = self.WeatherIDs[id]
+
+    if !index then return end
+
+    return self.Weathers[index]
 
 end
 
@@ -143,7 +160,7 @@ end
 function AtmosClass:SendWeather( pl )
 
 	local exists = IsValid( Atmos:GetWeather() );
-	local id = (exists && Atmos:GetWeather():GetID() || (self.LastWeather && self.LastWeather.ID || 0));
+	local id = (exists && Atmos:GetWeather():GetID() || (self.LastWeather && self.LastWeather.ID || 1));
 
 	if ( id != nil ) then
 

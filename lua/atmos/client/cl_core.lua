@@ -13,26 +13,16 @@ net.Receive( "atmos_weather", function( len )
 
 	atmos_log( string.format( "atmos_weather %s %s", tostring( enable ), tostring( id ) ) );
 
-	for k,v in pairs( Atmos.Weathers ) do
+	local weather = Atmos:GetWeatherByID( id );
 
-		if ( v.ID == id ) then
+	if !weather then Atmos:SetWeather( nil ) return end -- Sanity check
 
-			local weather = Atmos.Weathers[k];
-
-			if ( enable ) then
-
-				Atmos:SetWeather( weather );
-				weather:Start();
-
-			else
-
-				Atmos:SetWeather( nil );
-				weather:Finish();
-
-			end
-
-		end
-
+	if enable then
+		Atmos:SetWeather( weather );
+		weather:Start();
+	else
+		Atmos:SetWeather( nil );
+		weather:Finish();
 	end
 
 end );
