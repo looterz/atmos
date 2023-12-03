@@ -435,7 +435,7 @@ function SkyClass:UpdateSkybox()
 		self.CurrentSky.DuskScale = Lerp( frac, self.CurrentSky.DuskScale, self.NextSky.DuskScale );
 		self.CurrentSky.SunSize = Lerp( frac, self.CurrentSky.SunSize, self.NextSky.SunSize );
 
-		self.CurrentSunNormal = Lerp( frac, self.CurrentSunNormal, self.NewSunNormal );
+		self.CurrentSunNormal = LerpVector( frac, self.CurrentSunNormal, self.NewSunNormal );
 
 		self.SkyPaint:SetTopColor( self.CurrentSky.TopColor );
 		self.SkyPaint:SetBottomColor( self.CurrentSky.BottomColor );
