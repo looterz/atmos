@@ -3,7 +3,7 @@ local Weather = atmos_class();
 
 function Weather:__constructor()
 
-  self.ID = 1;
+  self.ID = 2;
 
 end
 

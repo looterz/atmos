@@ -20,7 +20,7 @@ function atmos_outside( pos )
 
 	local tr = util.TraceLine( trace );
 
-	Atmos.HeightMin = ( tr.HitPos - trace.start ):Length(); -- thanks to SW for this improvement
+	Atmos.HeightMin = tr.HitPos.z - trace.start.z; -- thanks to SW for this improvement
 
 	if ( tr.StartSolid ) then return false end
 	if ( tr.HitSky ) then return true end

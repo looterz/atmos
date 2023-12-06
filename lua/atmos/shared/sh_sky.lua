@@ -462,6 +462,7 @@ end
 
 local moonAlpha = 0;
 local moonMat = Material( "atmos/moon.png" );
+local devCVar = GetConVar( "developer" );
 moonMat:SetInt( "$additive", 0 );
 moonMat:SetInt( "$translucent", 0 );
 
@@ -492,6 +493,8 @@ function SkyClass:RenderMoon()
 		moonAlpha = Lerp( FrameTime() * 1, moonAlpha, 255 );
 
 		local moonSize = Atmos:GetSettings().MoonSize;
+
+		if !devCVar:GetBool() then return end -- Moon rendering is messed up, better to disable for now
 
 		cam.Start3D( vector_origin, self.LastSceneAngles );
 			render.OverrideDepthEnable( true, false );
