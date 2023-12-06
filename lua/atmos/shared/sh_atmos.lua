@@ -51,8 +51,6 @@ function AtmosClass:Initialize()
 		end );
 
 	end
-
-	self:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 end
 
 function AtmosClass:SetEnabled( bEnabled )
