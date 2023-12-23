@@ -460,7 +460,8 @@ function SkyClass:CalcView( pl, pos, ang, fov, nearZ, farZ )
 
 end
 
-local moonAlpha = 0;
+local moonColor = Color( 255, 255, 255, 0 );
+local moonAngle = Angle( 0, 0, 0 );
 local moonMat = Material( "atmos/moon.png" );
 local devCVar = GetConVar( "developer" );
 moonMat:SetInt( "$additive", 0 );
@@ -470,44 +471,35 @@ function SkyClass:RenderMoon()
 
 	if ( !IsValid( g_AtmosManager ) ) then return end
 
-	local time = g_AtmosManager:GetTime();
-	local night = ((time < 4 or time > 20) and true or false);
+	local night = ((self.Time < 4 or self.Time > 20) and true or false);
 
 	if ( night ) then
 
-		local mul;
+		-- Calculates time left until TIME_DAWN
+	    local hoursLeft = (self.Time >= 0 and 6 - self.Time) or (24 - self.Time) + 4;
 
-		if ( time > 20 ) then
+	    moonAngle.p = (hoursLeft / 8) * 360;
+	    moonAngle.y = moonAngle.p / 2;
 
-			mul = 1 - ( time + 4 ) / 8;
+		local pos = moonAngle:Forward() * ( self.LastFarZ * 0.900 );
+		local normal = -pos:GetNormal();
 
-		else
-
-			mul = 1 - ( time - 4 ) / 8;
-
-		end
-
-		local pos = Angle( 180 * mul, 0, 0 ):Forward() * ( self.LastFarZ * 0.900 );
-		local normal = ( vector_origin - pos ):GetNormal();
-
-		moonAlpha = Lerp( FrameTime() * 1, moonAlpha, 255 );
+		moonColor.a = Lerp( FrameTime() * 1, moonColor.a, 255 );
 
 		local moonSize = Atmos:GetSettings().MoonSize;
-
-		if !devCVar:GetBool() then return end -- Moon rendering is messed up, better to disable for now
 
 		cam.Start3D( vector_origin, self.LastSceneAngles );
 			render.OverrideDepthEnable( true, false );
 			render.SetMaterial( moonMat );
-			render.DrawQuadEasy( pos, normal, moonSize, moonSize, Color( 255, 255, 255, moonAlpha ), -180 );
+			render.DrawQuadEasy( pos, normal, moonSize, moonSize, moonColor, -180 );
 			render.OverrideDepthEnable( false, false );
 		cam.End3D();
 
 	else
 
-		if ( moonAlpha != 0 ) then
+		if ( moonColor.a != 0 ) then
 
-			moonAlpha = 0;
+			moonColor.a = 0;
 
 		end
 
