@@ -4,7 +4,7 @@ AtmosClass = atmos_class();
 function AtmosClass:__constructor()
 
 	self.Weathers = {};
-	self.WeathersIDs = {};
+	self.WeatherIDs = {};
 
 	self.HeightMin = 0;
 	self.NextOutsideCheck = 0;
@@ -101,9 +101,10 @@ function AtmosClass:RegisterWeather( weather )
 
 	table.insert( self.Weathers, weather );
 
-	if !weather.ID then return end -- sanity check for third-party addons
+	-- sanity check for third-party addons
+	if !weather.ID then return end
 
-	self.WeathersIDs[weather.ID] = #self.Weathers
+	self.WeatherIDs[weather.ID] = #self.Weathers
 
 end
 
