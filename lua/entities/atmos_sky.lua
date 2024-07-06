@@ -97,3 +97,33 @@ function ENT:CanEditVariables( ply )
 	return false;
 
 end
+
+-- HACK: https://github.com/looterz/atmos/issues/12
+function ENT:GetNetworkVars()
+	
+	local tbl = {
+		TopColor = self.Values.TopColor,
+		BottomColor = self.Values.BottomColor,
+		DuskColor = self.Values.DuskColor,
+		DuskIntensity = self.Values.DuskIntensity,
+		DuskScale = self.Values.DuskScale,
+		FadeBias = self.Values.FadeBias,
+		HDRScale = self.Values.HDRScale,
+		SunNormal = self.Values.SunNormal,
+		SunColor = self.Values.SunColor,
+		SunSize = self.Values.SunSize
+	}
+
+	-- (might) reduce __index calls a bit
+	if self.Values.DrawStars then
+		tbl.DrawStars = self.Values.DrawStars
+		tbl.StarLayers = self.Values.StarLayers
+		tbl.StarScale = self.Values.StarScale
+		tbl.StarFade = self.Values.StarFade
+		tbl.StarSpeed = self.Values.StarSpeed
+		tbl.StarTexture = self.Values.StarTexture
+	end
+
+	return tbl
+	
+end
