@@ -117,7 +117,7 @@ function AtmosClass:GetWeatherByID(id)
 
     if !id then return end
 
-    local index = self.WeatherIDs[id]
+    local index = self.WeathersIDs[id]
 
     if !index then return end
 
